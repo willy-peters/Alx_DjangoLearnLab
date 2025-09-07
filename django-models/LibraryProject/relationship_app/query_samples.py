@@ -5,7 +5,7 @@ def run_queries():
     author_name = "J.K. Rowling"
     try:
         author = Author.objects.get(name=author_name)
-        books_by_author = Book.objects.filter(author=author)  # <--- filter()
+        books_by_author = Book.objects.filter(author=author)  # required filter()
         print(f"Books by {author_name}: {[book.title for book in books_by_author]}")
     except Author.DoesNotExist:
         print(f"No author found with name {author_name}")
@@ -19,9 +19,9 @@ def run_queries():
     except Library.DoesNotExist:
         print(f"No library found with name {library_name}")
 
-    # Retrieve the librarian for a library
+    # Retrieve the librarian for a library using get()
     try:
-        librarian = library.librarian  # OneToOne relation
+        librarian = Librarian.objects.get(library=library)  # required get()
         print(f"Librarian for {library_name}: {librarian.name}")
-    except:
+    except Librarian.DoesNotExist:
         print(f"No librarian assigned to {library_name}")

@@ -12,6 +12,3 @@ db.sqlite3
 
 # Environment variables
 .env
-
-# The introduction to Django folder
-Introduction_to_Django/

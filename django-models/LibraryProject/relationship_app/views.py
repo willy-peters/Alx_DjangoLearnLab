@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from django.views.generic import DetailView
+from django.views.generic.detail import DetailView
 from .models import Book, Library
 
 # ----------------------------
@@ -15,11 +15,6 @@ def list_books(request):
 # ----------------------------
 class LibraryDetailView(DetailView):
     model = Library
-    template_name = "library_detail.html"
+    template_name = "relationship_app/library_detail.html"
     context_object_name = "library"
 
-    # Optionally override to include books
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["books"] = self.object.books.all()
-        return context

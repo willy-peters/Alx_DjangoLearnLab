@@ -130,4 +130,4 @@ LOGOUT_REDIRECT_URL = "login"
 AUTH_USER_MODEL = 'accounts.CustomUser'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-AUTH_USER_MODEL = 'bookshelf.CustomUser'
+# AUTH_USER_MODEL = 'bookshelf.CustomUser'

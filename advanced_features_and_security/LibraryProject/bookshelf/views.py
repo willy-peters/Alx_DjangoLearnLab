@@ -6,8 +6,8 @@ from django.db.models import Q
 from django.conf import settings
 
 from .models import Book
-from .forms import BookForm, BookSearchForm, ExampleForm   # ✅ Added ExampleForm
-
+from .forms import BookForm, BookSearchForm
+from .forms import ExampleForm 
 
 @permission_required("bookshelf.can_view", raise_exception=True)
 def book_list(request):

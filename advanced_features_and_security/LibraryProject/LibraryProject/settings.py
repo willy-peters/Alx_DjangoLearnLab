@@ -227,3 +227,31 @@ LOGGING = {
         "django.db.backends": {"handlers": ["console"], "level": "ERROR", "propagate": False},
     },
 }
+
+
+
+# ========================================
+# 🔒 Security Settings – HTTPS & Headers
+# ========================================
+
+# Redirect all HTTP traffic to HTTPS
+SECURE_SSL_REDIRECT = True
+
+# HTTP Strict Transport Security (HSTS)
+# Forces browsers to only use HTTPS for the next year
+SECURE_HSTS_SECONDS = 31536000  
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Apply to all subdomains
+SECURE_HSTS_PRELOAD = True             # Allow preload into browsers
+
+# Secure cookies – prevent sending over non-HTTPS
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+# Prevent clickjacking by disallowing iframes
+X_FRAME_OPTIONS = "DENY"
+
+# Protect against content-type sniffing
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Enable browser’s built-in XSS protection
+SECURE_BROWSER_XSS_FILTER = True

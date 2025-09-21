@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -152,3 +153,77 @@ SECURE_SSL_REDIRECT = True  # Redirect HTTP to HTTPS
 SECURE_HSTS_SECONDS = 31536000  # One year HSTS
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
+
+
+# SECURITY: In production set DEBUG = False. NEVER run with DEBUG=True in prod.
+DEBUG = False
+
+# IMPORTANT: set this to your domain(s) in production
+# ALLOWED_HOSTS = ["yourdomain.com", "www.yourdomain.com", "localhost", "127.0.0.1"]
+
+# ---- Cookies and HTTPS ----
+# Ensure cookies are sent only over HTTPS (set to True in production)
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+# Prevent browsers from guessing content types
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Enable Browser XSS filter
+SECURE_BROWSER_XSS_FILTER = True
+
+# Prevent clickjacking
+X_FRAME_OPTIONS = "DENY"  # alternatives: "SAMEORIGIN"
+
+# HSTS - only enable when you have HTTPS configured
+SECURE_HSTS_SECONDS = 31536000  # 1 year (adjust as required)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# Redirect all HTTP to HTTPS (ensure you have HTTPS)
+SECURE_SSL_REDIRECT = True
+
+# Other recommended settings
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")  # if behind a proxy/load balancer
+
+# SESSION and CSRF cookie flags
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = False  # typically False so JS can NOT read it; Django sets it in forms automatically.
+
+# Content Security Policy will be provided by middleware (see middleware below)
+
+# -----------------------
+# Middleware: insert CSP middleware (custom) and ensure SecurityMiddleware is enabled
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    # ... other middlewares ...
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # ... your custom CSP middleware (add after SecurityMiddleware or CommonMiddleware) ...
+    "bookshelf.middleware.ContentSecurityPolicyMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
+
+# Static/Media settings (for profile photos etc)
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+# Logging: surface suspicious behavior and SQL queries in DEBUG=False when needed
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {"class": "logging.StreamHandler"},
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+    },
+    "loggers": {
+        "django.security": {"handlers": ["console"], "level": "WARNING", "propagate": True},
+        "django.db.backends": {"handlers": ["console"], "level": "ERROR", "propagate": False},
+    },
+}

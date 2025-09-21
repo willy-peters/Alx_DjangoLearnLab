@@ -1,0 +1,20 @@
+<!-- bookshelf/templates/bookshelf/book_list.html -->
+{% extends "base.html" %}
+{% block content %}
+  <h1>Books</h1>
+
+  <form method="get" action="{% url 'bookshelf:book_list' %}">
+    {# GET forms typically don't require CSRF, but it's harmless to include for safety #}
+    {% csrf_token %}
+    <input type="search" name="q" placeholder="Search title or author" value="{{ request.GET.q|default:''|escape }}">
+    <button type="submit">Search</button>
+  </form>
+
+  <ul>
+    {% for book in books %}
+      <li>{{ book.title|escape }} — {{ book.author|escape }}</li>
+    {% empty %}
+      <li>No books found</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

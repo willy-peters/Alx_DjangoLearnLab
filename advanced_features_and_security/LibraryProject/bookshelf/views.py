@@ -3,8 +3,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.contrib.auth.decorators import permission_required
 from .models import Book
-from .forms import BookForm
+from .forms import BookForm, BookSearchForm
 from django.db.models import Q
+from django.conf import settings
 
 @permission_required("bookshelf.can_view", raise_exception=True)
 def book_list(request):
@@ -47,3 +48,43 @@ def add_book(request):
     else:
         form = BookForm()
     return render(request, 'bookshelf/form_example.html', {'form': form})
+
+def book_list(request):
+    """
+    Search and list books.
+    Important security practices:
+    - Use Django ORM to avoid SQL injection (no string formatting into queries).
+    - Validate user input via forms.
+    - Escape output in templates (Django auto-escapes).
+    """
+    form = BookSearchForm(request.GET or None)
+    books = Book.objects.none()
+
+    if form.is_valid():
+        q = form.cleaned_data.get("q")
+        if q:
+            # Parameterized ORM query, safe from SQL injection
+            books = Book.objects.filter(
+                Q(title__icontains=q) | Q(author__icontains=q)
+            ).distinct()
+        else:
+            books = Book.objects.all()
+
+    context = {"books": books, "form": form}
+    return render(request, "bookshelf/book_list.html", context)
+
+
+def book_create(request):
+    """
+    Example of secure form handling for POST requests.
+    - Uses Django ModelForm for validation and safe saving.
+    - CSRF protection is enforced by CsrfViewMiddleware and {% csrf_token %}.
+    """
+    if request.method == "POST":
+        form = BookForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("bookshelf:book_list")
+    else:
+        form = BookForm()
+    return render(request, "bookshelf/form_example.html", {"form": form})

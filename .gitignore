@@ -16,3 +16,4 @@ db.sqlite3
 # The introduction to Django folder
 Introduction_to_Django/
 django-models/
+advanced_features_and_security/

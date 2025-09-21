@@ -131,3 +131,24 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 # AUTH_USER_MODEL = 'bookshelf.CustomUser'
+
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False  # Always False in production
+
+# XSS protection
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Clickjacking protection
+X_FRAME_OPTIONS = 'DENY'  # Prevent your site from being framed
+
+# CSRF and session cookies
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+# HTTPS settings (if using HTTPS)
+SECURE_SSL_REDIRECT = True  # Redirect HTTP to HTTPS
+SECURE_HSTS_SECONDS = 31536000  # One year HSTS
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True

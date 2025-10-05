@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
-from .models import Post
+from .models import Post, Comment
 
 
 class AuthTests(TestCase):
@@ -84,3 +84,41 @@ class PostCRUDTests(TestCase):
         resp2 = self.client.post(url)
         self.assertEqual(resp2.status_code, 302)
         self.assertFalse(Post.objects.filter(pk=self.post.pk).exists())
+
+class CommentTests(TestCase):
+    def setUp(self):
+        self.author = User.objects.create_user(username='author', password='pass')
+        self.other = User.objects.create_user(username='other', password='pass')
+        self.post = Post.objects.create(title='T', content='C', author=self.author)
+        self.comment = Comment.objects.create(post=self.post, author=self.author, content='First comment')
+
+    def test_create_comment_requires_login(self):
+        url = reverse('blog:comment-create', kwargs={'post_pk': self.post.pk})
+        resp = self.client.post(url, {'content': 'Hi'})
+        self.assertEqual(resp.status_code, 302)  # redirect to login
+
+        self.client.login(username='other', password='pass')
+        resp2 = self.client.post(url, {'content': 'Hi'})
+        self.assertEqual(resp2.status_code, 302)
+        self.assertTrue(Comment.objects.filter(content='Hi', author=self.other).exists())
+
+    def test_edit_only_author(self):
+        url = reverse('blog:comment-update', kwargs={'pk': self.comment.pk})
+        self.client.login(username='other', password='pass')
+        resp = self.client.get(url)
+        self.assertIn(resp.status_code, (302, 403))  # redirect or forbidden
+        self.client.login(username='author', password='pass')
+        resp2 = self.client.post(url, {'content': 'Edited'})
+        self.assertEqual(resp2.status_code, 302)
+        self.comment.refresh_from_db()
+        self.assertEqual(self.comment.content, 'Edited')
+
+    def test_delete_only_author(self):
+        url = reverse('blog:comment-delete', kwargs={'pk': self.comment.pk})
+        self.client.login(username='other', password='pass')
+        resp = self.client.post(url)
+        self.assertIn(resp.status_code, (302, 403))
+        self.client.login(username='author', password='pass')
+        resp2 = self.client.post(url)
+        self.assertEqual(resp2.status_code, 302)
+        self.assertFalse(Comment.objects.filter(pk=self.comment.pk).exists())

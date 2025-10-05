@@ -1,0 +1,16 @@
+{# blog/templates/blog/comment_form.html #}
+{% extends 'blog/base.html' %}
+{% block title %}{% if form.instance.pk %}Edit comment{% else %}New comment{% endif %}{% endblock %}
+{% block content %}
+  <h2>{% if form.instance.pk %}Edit comment{% else %}New comment{% endif %}</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">{% if form.instance.pk %}Save changes{% else %}Post comment{% endif %}</button>
+  </form>
+  {% if form.instance.pk %}
+    <p><a href="{% url 'blog:post-detail' form.instance.post.pk %}">Cancel</a></p>
+  {% else %}
+    <p><a href="{% url 'blog:post-detail' post.pk %}">Cancel</a></p>
+  {% endif %}
+{% endblock %}

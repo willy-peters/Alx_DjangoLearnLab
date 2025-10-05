@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Profile
-from .models import Post
+from .models import Post, Comment
 
 
 
@@ -35,3 +35,21 @@ class PostForm(forms.ModelForm):
             'title': forms.TextInput(attrs={'placeholder': 'Post title', 'class': 'input'}),
             'content': forms.Textarea(attrs={'placeholder': 'Write your post here...', 'rows': 10, 'class': 'textarea'}),
         }
+
+
+class CommentForm(forms.ModelForm):
+    content = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'Write a comment...'}),
+        max_length=2000,
+        label=''
+    )
+
+    class Meta:
+        model = Comment
+        fields = ['content']
+
+    def clean_content(self):
+        data = self.cleaned_data.get('content', '').strip()
+        if not data:
+            raise forms.ValidationError("Comment cannot be empty.")
+        return data

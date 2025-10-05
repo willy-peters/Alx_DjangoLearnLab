@@ -1,0 +1,28 @@
+{% extends 'blog/base.html' %}
+{% block title %}Posts{% endblock %}
+{% block content %}
+  <h2>All Posts</h2>
+  {% if user.is_authenticated %}
+    <p><a class="btn" href="{% url 'blog:post-create' %}">Create New Post</a></p>
+  {% endif %}
+
+  {% for post in posts %}
+    <article class="post-snippet">
+      <h3><a href="{% url 'blog:post-detail' post.pk %}">{{ post.title }}</a></h3>
+      <p class="meta">By {{ post.author.username }} • {{ post.published_date|date:"M d, Y H:i" }}</p>
+      <p>{{ post.content|truncatechars:200 }}</p>
+      <p><a href="{% url 'blog:post-detail' post.pk %}">Read more →</a></p>
+    </article>
+    <hr>
+  {% empty %}
+    <p>No posts yet.</p>
+  {% endfor %}
+
+  {% if is_paginated %}
+    <div class="pagination">
+      {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}
+      <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Next</a>{% endif %}
+    </div>
+  {% endif %}
+{% endblock %}

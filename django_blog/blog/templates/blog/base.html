@@ -1,34 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>{% block title %}My Blog{% endblock %}</title>
-  {% load static %}
-  <link rel="stylesheet" href="{% static 'blog/css/style.css' %}">
-</head>
-<body>
-  <header>
-    <nav>
-      <a href="{% url 'blog:profile' %}">Profile</a> |
-      {% if user.is_authenticated %}
+  <head>
+    <meta charset="utf-8" />
+    <title>{% block title %}My Blog{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'blog/css/style.css' %}" />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="{% url 'blog:profile' %}">Profile</a> | {% if
+        user.is_authenticated %}
+        <a href="{% url 'blog:post-list' %}">Posts</a>
+        {% if user.is_authenticated %} |
+        <a href="{% url 'blog:post-create' %}">New Post</a> {% endif %} |
+        <a href="{% url 'blog:profile' %}">Profile</a>
+        {% if user.is_authenticated %} |
         <a href="{% url 'blog:logout' %}">Logout</a>
-      {% else %}
+        {% else %}
         <a href="{% url 'blog:login' %}">Login</a> |
         <a href="{% url 'blog:register' %}">Register</a>
-      {% endif %}
-    </nav>
-  </header>
+        {% endif %}
+      </nav>
+    </header>
 
-  <main>
-    {% if messages %}
+    <main>
+      {% if messages %}
       <ul class="messages">
         {% for message in messages %}
-          <li class="message {{ message.tags }}">{{ message }}</li>
+        <li class="message {{ message.tags }}">{{ message }}</li>
         {% endfor %}
       </ul>
-    {% endif %}
-
-    {% block content %}{% endblock %}
-  </main>
-</body>
+      {% endif %} {% block content %}{% endblock %}
+    </main>
+  </body>
 </html>

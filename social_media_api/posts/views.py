@@ -61,4 +61,4 @@ class FeedView(generics.ListAPIView):
         # users the current user follows
         following_qs = user.following.all()
         # get posts where author is in following set
-        return Post.objects.filter(author__in=following_qs).order_by('-created_at').select_related('author').prefetch_related('comments')
+        return Post.objects.filter(author__in=following_users).order_by('-created_at').select_related('author').prefetch_related('comments')

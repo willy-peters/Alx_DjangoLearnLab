@@ -1,11 +1,14 @@
 from rest_framework import viewsets, permissions, filters, generics
 from rest_framework.pagination import PageNumberPagination
+from rest_framework import status
 from django.shortcuts import get_object_or_404
-from .models import Post, Comment
+from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer
 from .permissions import IsOwnerOrReadOnly
-from .serializers import PostSerializer
+from .serializers import PostSerializer, LikeSerializer
 from django.contrib.auth import get_user_model
+from notifications.models import LikeSerializer 
+from rest_framework.response import Response
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -62,3 +65,35 @@ class FeedView(generics.ListAPIView):
         following_qs = user.following.all()
         # get posts where author is in following set
         return Post.objects.filter(author__in=following_users).order_by('-created_at').select_related('author').prefetch_related('comments')
+    
+
+class LikePostView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, id=pk)
+        like, created = Like.objects.get_or_create(post=post, user=request.user)
+        if not created:
+            return Response({"detail": "You have already liked this post."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Create notification
+        if post.author != request.user:
+            Notification.objects.create(
+                recipient=post.author,
+                actor=request.user,
+                verb='liked your post',
+                target=post
+            )
+
+        return Response({"detail": "Post liked successfully."}, status=status.HTTP_201_CREATED)
+
+class UnlikePostView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, id=pk)
+        like = Like.objects.filter(post=post, user=request.user).first()
+        if not like:
+            return Response({"detail": "You have not liked this post."}, status=status.HTTP_400_BAD_REQUEST)
+        like.delete()
+        return Response({"detail": "Post unliked successfully."}, status=status.HTTP_200_OK)

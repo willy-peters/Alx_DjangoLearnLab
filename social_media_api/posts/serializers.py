@@ -21,3 +21,15 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = ('id', 'author', 'title', 'content', 'created_at', 'updated_at', 'comments')
         read_only_fields = ('id', 'author', 'created_at', 'updated_at', 'comments')
+
+from rest_framework import serializers
+from .models import Like, Post
+
+class LikeSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(source='user.username', read_only=True)
+    post = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all())
+
+    class Meta:
+        model = Like
+        fields = ('id', 'post', 'user', 'created_at')
+        read_only_fields = ('id', 'user', 'created_at')

@@ -6,10 +6,11 @@ from django.urls import reverse_lazy, reverse
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import Post, Comment
+from .models import Post, Comment, Tag
 from .forms import PostForm
 from django.shortcuts import get_object_or_404
 from .forms import CommentForm
+from django.db.models import Q
 
 
 
@@ -142,3 +143,39 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def get_success_url(self):
         return reverse('blog:post-detail', kwargs={'pk': self.get_object().post.pk})
+    
+
+# Posts by tag
+class PostsByTagListView(ListView):
+    model = Post
+    template_name = 'blog/posts_by_tag.html'
+    context_object_name = 'posts'
+    paginate_by = 5
+
+    def get_queryset(self):
+        tag_name = self.kwargs.get('tag_name')
+        return Post.objects.filter(tags__name__iexact=tag_name).order_by('-published_date')
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['tag_name'] = self.kwargs.get('tag_name')
+        return ctx
+
+
+
+
+# Search view (function-based for simplicity)
+from django.views.decorators.http import require_GET
+
+@require_GET
+def search_results(request):
+    q = request.GET.get('q', '').strip()
+    results = Post.objects.none()
+    if q:
+        results = Post.objects.filter(
+            Q(title__icontains=q) |
+            Q(content__icontains=q) |
+            Q(tags__name__icontains=q)
+        ).distinct().order_by('-published_date')
+    context = {'query': q, 'results': results}
+    return render(request, 'blog/search_results.html', context)

@@ -21,6 +21,13 @@
         <a href="{% url 'blog:login' %}">Login</a> |
         <a href="{% url 'blog:register' %}">Register</a>
         {% endif %}
+
+        <!-- inside blog/templates/blog/base.html, in <header> or nav -->
+        <form action="{% url 'blog:search' %}" method="get" class="search-form" style="display:inline;">
+          <input type="text" name="q" placeholder="Search posts or tags..." value="{{ request.GET.q|default:'' }}">
+          <button type="submit">Search</button>
+        </form>
+
       </nav>
     </header>
 

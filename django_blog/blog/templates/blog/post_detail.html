@@ -59,3 +59,12 @@
 
   <p><a href="{% url 'blog:post-list' %}">← Back to posts</a></p>
 {% endblock %}
+<!-- show tags -->
+{% if post.tags.exists %}
+  <p class="tags">
+    Tags:
+    {% for tag in post.tags.all %}
+      <a href="{% url 'blog:posts-by-tag' tag.name %}" class="tag-link">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+  </p>
+{% endif %}

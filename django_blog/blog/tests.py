@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
-from .models import Post, Comment
+from .models import Post, Comment, Tag
 
 
 class AuthTests(TestCase):
@@ -122,3 +122,28 @@ class CommentTests(TestCase):
         resp2 = self.client.post(url)
         self.assertEqual(resp2.status_code, 302)
         self.assertFalse(Comment.objects.filter(pk=self.comment.pk).exists())
+
+
+class TagAndSearchTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='u', password='p')
+        self.post1 = Post.objects.create(title='Django tips', content='Search me', author=self.user)
+        self.post2 = Post.objects.create(title='Python tricks', content='Useful content', author=self.user)
+        tag = Tag.objects.create(name='django')
+        self.post1.tags.add(tag)
+
+    def test_posts_by_tag(self):
+        url = reverse('blog:posts-by-tag', kwargs={'tag_name': 'django'})
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'Django tips')
+        self.assertNotContains(resp, 'Python tricks')
+
+    def test_search_by_title_content_tag(self):
+        url = reverse('blog:search') + '?q=Search'
+        resp = self.client.get(url)
+        self.assertContains(resp, 'Django tips')
+
+        url2 = reverse('blog:search') + '?q=django'
+        resp2 = self.client.get(url2)
+        self.assertContains(resp2, 'Django tips')

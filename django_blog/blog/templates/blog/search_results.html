@@ -1,0 +1,19 @@
+{# blog/templates/blog/search_results.html #}
+{% extends 'blog/base.html' %}
+{% block title %}Search{% endblock %}
+{% block content %}
+  <h2>Search results for "{{ query }}"</h2>
+  {% if results %}
+    <ul>
+      {% for post in results %}
+        <li>
+          <a href="{% url 'blog:post-detail' post.pk %}">{{ post.title }}</a>
+          <p class="meta">By {{ post.author.username }} • {{ post.published_date|date:"M d, Y" }}</p>
+          <p>{{ post.content|truncatechars:150 }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No results found.</p>
+  {% endif %}
+{% endblock %}

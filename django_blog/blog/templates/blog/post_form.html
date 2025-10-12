@@ -11,3 +11,14 @@
 
   <p><a href="{% url 'blog:post-list' %}">Cancel</a></p>
 {% endblock %}
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <!-- show tags field -->
+  <p>
+    {{ form.tags_field.label_tag }}
+    {{ form.tags_field }}
+  </p>
+  <button type="submit">Save</button>
+</form>

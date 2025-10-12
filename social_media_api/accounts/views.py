@@ -4,6 +4,12 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from .models import User
 from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
+from rest_framework.decorators import action
+from rest_framework import viewsets
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+
+User = get_user_model()
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -37,3 +43,29 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class FollowView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, user_id):
+        """
+        Follow user with id=user_id
+        """
+        target = get_object_or_404(User, id=user_id)
+        if target == request.user:
+            return Response({"detail": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
+
+        request.user.following.add(target)
+        return Response({"detail": f"You are now following {target.username}."}, status=status.HTTP_200_OK)
+
+    def delete(self, request, user_id):
+        """
+        Unfollow user with id=user_id
+        """
+        target = get_object_or_404(User, id=user_id)
+        if target == request.user:
+            return Response({"detail": "You cannot unfollow yourself."}, status=status.HTTP_400_BAD_REQUEST)
+
+        request.user.following.remove(target)
+        return Response({"detail": f"You have unfollowed {target.username}."}, status=status.HTTP_200_OK)

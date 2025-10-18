@@ -19,6 +19,8 @@ from pathlib import Path
 # Base
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+PORT = os.getenv("PORT", "8000")
+
 # Security
 DEBUG = False
 ALLOWED_HOSTS = ['willy005.pythonanywhere.com']

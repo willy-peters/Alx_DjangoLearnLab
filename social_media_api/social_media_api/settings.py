@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security
 DEBUG = False
-ALLOWED_HOSTS = ['social_media_api.herokuapp.com']
+ALLOWED_HOSTS = ['willy005.pythonanywhere.com']
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'unsafe-default-key')
 
@@ -29,7 +29,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'unsafe-default-key')
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_SSL_REDIRECT = True  # redirect HTTP to HTTPS
+SECURE_SSL_REDIRECT = False
 
 # Static files
 STATIC_URL = '/static/'

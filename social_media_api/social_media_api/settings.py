@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security
 DEBUG = False
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['social_media_api.herokuapp.com']
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'unsafe-default-key')
 
@@ -41,8 +41,12 @@ MEDIA_ROOT = BASE_DIR / 'mediafiles'
 
 # Database (PostgreSQL)
 import dj_database_url
+from decouple import config
+
+
+
 DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+    'default': dj_database_url.config(default=config('DATABASE_URL'))
 }
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
